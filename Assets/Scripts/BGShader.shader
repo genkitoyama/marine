@@ -1,14 +1,12 @@
-﻿Shader "Custom/SphereShader"
+﻿Shader "Custom/BGShader"
 {
 	Properties
 	{
-		_MainTex ("Base (RGB) Trans (A)", 2D) = "white" {}
-		_Color("Color", Color) = (1,1,1,0)
-		_Alpha("Alpha", float) = 0.5
+		_MainTex ("Texture", 2D) = "black" {}
 	}
 	SubShader
 	{
-		Tags { "Queue"="Transparent" "IgnoreProjector"="True"  "RenderType"="Transparent" }
+		Tags { "Queue"="Transparent" "IgnoreProjector"="True" "RenderType"="Transparent" }
 		LOD 100
 
 		ZWrite Off
@@ -39,9 +37,6 @@
 
 			sampler2D _MainTex;
 			float4 _MainTex_ST;
-
-			uniform float _Alpha;
-			uniform float4 _Color;
 			
 			v2f vert (appdata v)
 			{
@@ -57,9 +52,15 @@
 				// sample the texture
 				fixed4 col = tex2D(_MainTex, i.uv);
 				// apply fog
-				// UNITY_APPLY_FOG(i.fogCoord, col);
-				col.rgb *= _Color.rgb;
-				col.a = _Alpha;
+				UNITY_APPLY_FOG(i.fogCoord, col);
+
+				col = fixed4(0.0, 0.0, 0.0, 1.0);
+
+				fixed3 BG1 = fixed3(0.01, 0.01, 0.01);
+				fixed3 BG2 = fixed3(0.1, 0.05, 0.15);
+
+				col.rgb = lerp(BG1, BG2, i.uv.y);
+
 				return col;
 			}
 			ENDCG
